@@ -28,7 +28,7 @@ public class SearchDemo {
 
     /**
      * @Author xrca
-     * @Description term查询
+     * @Description term查询 -> where name like '%keyword%'
      * @Date 2020-08-23 23:17
      * @Param []
      * @return java.lang.String
@@ -45,6 +45,40 @@ public class SearchDemo {
             BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery().should(QueryBuilders.termQuery("name", keyword));
             boolQueryBuilder.should(QueryBuilders.termQuery("director", keyword));
             boolQueryBuilder.should(QueryBuilders.termQuery("desc", keyword));
+            searchSourceBuilder.query(boolQueryBuilder);
+        }
+
+        // 在request中添加查询内容
+        searchRequest.source(searchSourceBuilder);
+
+        SearchResponse searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
+        if (searchResponse.getHits() != null && searchResponse.getHits().getTotalHits().value > 0) {
+            List<String> response = new ArrayList<>(searchResponse.getHits().getHits().length);
+            for (SearchHit searchHit : searchResponse.getHits().getHits()) {
+                response.add(searchHit.getSourceAsString());
+            }
+            return response.toString();
+        }
+        return "";
+    }
+
+    /**
+     * @Author xrca
+     * @Description terms查询 -> where name like '%keyword1%' or name like '%keyword%'
+     * @Date 2020-08-23 23:40
+     * @Param [keywords]
+     * @return java.lang.String
+     **/
+    public String termsSearch(String keywords) throws Exception {
+        SearchRequest searchRequest = new SearchRequest("movie");
+
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        // 分页
+        searchSourceBuilder.from(0).size(10);
+
+        // 添加or查询
+        if (!StringUtils.isEmpty(keywords)) {
+            BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery().should(QueryBuilders.termsQuery("desc", keywords.split(",")));
             searchSourceBuilder.query(boolQueryBuilder);
         }
 

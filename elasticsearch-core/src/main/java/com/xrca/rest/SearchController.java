@@ -27,4 +27,14 @@ public class SearchController {
             return "";
         }
     }
+
+    @GetMapping("termsSearch")
+    public String termsSearch(String keywords) {
+        try {
+            return searchDemo.termsSearch(keywords);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
 }
