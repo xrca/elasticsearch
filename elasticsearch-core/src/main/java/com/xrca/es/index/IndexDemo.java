@@ -1,10 +1,11 @@
 package com.xrca.es.index;
 
 import org.elasticsearch.action.admin.indices.alias.Alias;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
+import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.client.indices.CreateIndexRequest;
-import org.elasticsearch.client.indices.CreateIndexResponse;
+import org.elasticsearch.client.indices.*;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentType;
@@ -155,5 +156,44 @@ public class IndexDemo {
         // 发送请求
         CreateIndexResponse createIndexResponse = restHighLevelClient.indices().create(createIndexRequest, RequestOptions.DEFAULT);
         System.out.println(createIndexResponse);
+    }
+
+    /**
+     * @Author xrca
+     * @Description 查看索引是否存在
+     * @Date 2020-08-23 16:59
+     * @Param []
+     * @return boolean
+     **/
+    public boolean indexExist() throws Exception {
+        GetIndexRequest getIndexRequest = new GetIndexRequest("movie");
+        boolean exist = restHighLevelClient.indices().exists(getIndexRequest, RequestOptions.DEFAULT);
+        return exist;
+    }
+
+    /**
+     * @Author xrca
+     * @Description 删除索引
+     * @Date 2020-08-23 17:01
+     * @Param []
+     * @return boolean
+     **/
+    public boolean deleteIndex() throws Exception {
+        DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest("music");
+        AcknowledgedResponse acknowledgedResponse = restHighLevelClient.indices().delete(deleteIndexRequest, RequestOptions.DEFAULT);
+        return acknowledgedResponse.isAcknowledged();
+    }
+
+    /**
+     * @Author xrca
+     * @Description 获取索引的mapping
+     * @Date 2020-08-23 17:13
+     * @Param []
+     * @return java.lang.String
+     **/
+    public String getMappings() throws Exception {
+        GetMappingsRequest getMappingsRequest = new GetMappingsRequest().indices("book");
+        GetMappingsResponse getMappingsResponse = restHighLevelClient.indices().getMapping(getMappingsRequest, RequestOptions.DEFAULT);
+        return getMappingsResponse.mappings().get("book").getSourceAsMap().toString();
     }
 }

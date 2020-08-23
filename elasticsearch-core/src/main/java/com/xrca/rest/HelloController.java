@@ -45,4 +45,34 @@ public class HelloController {
         }
         return "ok";
     }
+
+    @GetMapping("indexExist")
+    public String existIndex() {
+        try {
+            return indexDemo.indexExist() ? "ok" : "fail";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "fail";
+        }
+    }
+
+    @GetMapping("deleteIndex")
+    public String deleteIndex() {
+        try {
+            return indexDemo.deleteIndex() ? "ok" : "fail";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "fail";
+        }
+    }
+
+    @GetMapping("getMapping")
+    public String getMapping() {
+        try {
+            return indexDemo.getMappings();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "fail";
+        }
+    }
 }
