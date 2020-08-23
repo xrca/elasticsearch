@@ -1,0 +1,9 @@
+server:
+  port: 8888
+  servlet:
+    context-path: /es
+
+
+elasticsearch:
+  # 多个,分割 ip1:9200,ip2:9200,...
+  hosts: 127.0.0.1:9200
