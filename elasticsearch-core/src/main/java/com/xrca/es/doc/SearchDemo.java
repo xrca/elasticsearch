@@ -5,6 +5,7 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.Operator;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -51,6 +52,7 @@ public class SearchDemo {
         // 在request中添加查询内容
         searchRequest.source(searchSourceBuilder);
 
+        // 解析查询结果
         SearchResponse searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
         if (searchResponse.getHits() != null && searchResponse.getHits().getTotalHits().value > 0) {
             List<String> response = new ArrayList<>(searchResponse.getHits().getHits().length);
@@ -85,6 +87,95 @@ public class SearchDemo {
         // 在request中添加查询内容
         searchRequest.source(searchSourceBuilder);
 
+        // 解析查询结果
+        SearchResponse searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
+        if (searchResponse.getHits() != null && searchResponse.getHits().getTotalHits().value > 0) {
+            List<String> response = new ArrayList<>(searchResponse.getHits().getHits().length);
+            for (SearchHit searchHit : searchResponse.getHits().getHits()) {
+                response.add(searchHit.getSourceAsString());
+            }
+            return response.toString();
+        }
+        return "";
+    }
+
+    /**
+     * @Author xrca
+     * @Description matchAll查询，查询所有 -> select * from xxx
+     * @Date 2020-08-24 20:36
+     * @Param []
+     * @return java.lang.String
+     **/
+    public String matchAllSearch() throws Exception {
+        SearchRequest searchRequest = new SearchRequest("movie");
+
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        // 查询所有
+        searchSourceBuilder.query(QueryBuilders.matchAllQuery());
+
+        searchRequest.source(searchSourceBuilder);
+
+        // 解析查询结果
+        SearchResponse searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
+        if (searchResponse.getHits() != null && searchResponse.getHits().getTotalHits().value > 0) {
+            List<String> response = new ArrayList<>(searchResponse.getHits().getHits().length);
+            for (SearchHit searchHit : searchResponse.getHits().getHits()) {
+                response.add(searchHit.getSourceAsString());
+            }
+            return response.toString();
+        }
+        return "";
+    }
+
+    /**
+     * @Author xrca
+     * @Description match查询
+     * @Date 2020-08-24 20:43
+     * @Param [keyword]
+     * @return java.lang.String
+     **/
+    public String matchSearch(String keyword) throws Exception {
+        SearchRequest searchRequest = new SearchRequest("movie");
+
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        // 查询desc相关额内容
+        searchSourceBuilder.query(QueryBuilders.matchQuery("desc", keyword));
+
+        searchRequest.source(searchSourceBuilder);
+
+        // 解析查询结果
+        SearchResponse searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
+        if (searchResponse.getHits() != null && searchResponse.getHits().getTotalHits().value > 0) {
+            List<String> response = new ArrayList<>(searchResponse.getHits().getHits().length);
+            for (SearchHit searchHit : searchResponse.getHits().getHits()) {
+                response.add(searchHit.getSourceAsString());
+            }
+            return response.toString();
+        }
+        return "";
+    }
+
+    /**
+     * @Author xrca
+     * @Description match中的bool查询，分词后需要全部匹配
+     * @Date 2020-08-24 20:57
+     * @Param [keyword, op]
+     * @return java.lang.String
+     **/
+    public String matchBoolSearch(String keyword, String op) throws Exception {
+        SearchRequest searchRequest = new SearchRequest("movie");
+
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        // match查询，将关键词分词后查询
+        // tips：还可以指定分词，指定将keyword分词时，使用那种分词器
+        searchSourceBuilder.query(QueryBuilders
+                .matchQuery("desc", keyword)
+                .operator("AND".equalsIgnoreCase(op) ? Operator.AND : Operator.OR)
+                .analyzer("ik_max_word"));
+
+        searchRequest.source(searchSourceBuilder);
+
+        // 解析查询结果
         SearchResponse searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
         if (searchResponse.getHits() != null && searchResponse.getHits().getTotalHits().value > 0) {
             List<String> response = new ArrayList<>(searchResponse.getHits().getHits().length);
