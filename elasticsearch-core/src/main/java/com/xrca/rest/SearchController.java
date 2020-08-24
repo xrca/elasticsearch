@@ -100,4 +100,30 @@ public class SearchController {
             return "";
         }
     }
+
+    @GetMapping("getById")
+    public String getById(String id) {
+        if (StringUtils.isEmpty(id)) {
+            return "请指定文档id";
+        }
+        try {
+            return searchDemo.searchById(id);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+    @GetMapping("getByIds")
+    public String getByIds(String ids) {
+        if (StringUtils.isEmpty(ids)) {
+            return "请指定文档id";
+        }
+        try {
+            return searchDemo.searchByIds(ids);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
 }

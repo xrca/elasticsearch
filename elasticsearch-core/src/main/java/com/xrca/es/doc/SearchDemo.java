@@ -1,5 +1,7 @@
 package com.xrca.es.doc;
 
+import org.elasticsearch.action.get.GetRequest;
+import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
@@ -14,7 +16,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -234,6 +235,48 @@ public class SearchDemo {
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         // 指定查询的字段，同时指定分词器
         searchSourceBuilder.query(QueryBuilders.multiMatchQuery(keyword, "name", "director", "desc").analyzer("ik_max_word"));
+
+        searchRequest.source(searchSourceBuilder);
+        // 解析查询结果
+        SearchResponse searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
+        if (searchResponse.getHits() != null && searchResponse.getHits().getTotalHits().value > 0) {
+            List<String> response = new ArrayList<>(searchResponse.getHits().getHits().length);
+            for (SearchHit searchHit : searchResponse.getHits().getHits()) {
+                response.add(searchHit.getSourceAsString());
+            }
+            return response.toString();
+        }
+        return "";
+    }
+
+    /**
+     * @Author xrca
+     * @Description 根据id查询文档
+     * @Date 2020-08-24 21:55
+     * @Param [id]
+     * @return java.lang.String
+     **/
+    public String searchById(String id) throws Exception {
+        GetRequest getRequest = new GetRequest("movie", id);
+
+        // 查询，并返回文档
+        GetResponse getResponse = restHighLevelClient.get(getRequest, RequestOptions.DEFAULT);
+        return getResponse.getSourceAsString();
+    }
+
+    /**
+     * @Author xrca
+     * @Description 根据一组id查询文档
+     * @Date 2020-08-24 21:55
+     * @Param [id]
+     * @return java.lang.String
+     **/
+    public String searchByIds(String ids) throws Exception {
+        SearchRequest searchRequest = new SearchRequest("movie");
+
+        // 查询，并返回文档
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        searchSourceBuilder.query(QueryBuilders.idsQuery().addIds(ids.split(",")));
 
         searchRequest.source(searchSourceBuilder);
         // 解析查询结果
