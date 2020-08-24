@@ -74,4 +74,17 @@ public class SearchController {
             return "";
         }
     }
+
+    @GetMapping("mustAndShouldSearch")
+    public String mustAndShouldSearch(String keyword) {
+        if (StringUtils.isEmpty(keyword)) {
+            return "请输入关键字";
+        }
+        try {
+            return searchDemo.mustAndShouldSearch(keyword);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
 }

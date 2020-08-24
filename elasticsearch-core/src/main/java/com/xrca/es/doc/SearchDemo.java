@@ -186,4 +186,38 @@ public class SearchDemo {
         }
         return "";
     }
+
+    /**
+     * @Author xrca
+     * @Description must & should查询
+     * @Date 2020-08-24 21:09
+     * @Param [keyword]
+     * @return java.lang.String
+     **/
+    public String mustAndShouldSearch(String keyword) throws Exception {
+        SearchRequest searchRequest = new SearchRequest("movie");
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+
+        // bool查询，区别于上面的matchBool，进行多字段的bool查询
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        // must：必须满足query条件 should：query条件可以不满足
+        boolQueryBuilder.should(QueryBuilders.matchQuery("name", keyword));
+        boolQueryBuilder.must(QueryBuilders.matchQuery("desc", keyword).operator(Operator.OR));
+
+        searchSourceBuilder.query(boolQueryBuilder);
+        searchRequest.source(searchSourceBuilder);
+
+        searchRequest.source(searchSourceBuilder);
+
+        // 解析查询结果
+        SearchResponse searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
+        if (searchResponse.getHits() != null && searchResponse.getHits().getTotalHits().value > 0) {
+            List<String> response = new ArrayList<>(searchResponse.getHits().getHits().length);
+            for (SearchHit searchHit : searchResponse.getHits().getHits()) {
+                response.add(searchHit.getSourceAsString());
+            }
+            return response.toString();
+        }
+        return "";
+    }
 }
