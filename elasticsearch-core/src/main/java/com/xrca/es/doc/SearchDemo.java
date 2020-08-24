@@ -220,4 +220,31 @@ public class SearchDemo {
         }
         return "";
     }
+
+    /**
+     * @Author xrca
+     * @Description multi_match查询，同一keyword去匹配多个字段，匹配到一个即可
+     * @Date 2020-08-24 21:35
+     * @Param [keyword]
+     * @return java.lang.String
+     **/
+    public String multiSearch(String keyword) throws Exception {
+        SearchRequest searchRequest = new SearchRequest("movie");
+
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        // 指定查询的字段，同时指定分词器
+        searchSourceBuilder.query(QueryBuilders.multiMatchQuery(keyword, "name", "director", "desc").analyzer("ik_max_word"));
+
+        searchRequest.source(searchSourceBuilder);
+        // 解析查询结果
+        SearchResponse searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
+        if (searchResponse.getHits() != null && searchResponse.getHits().getTotalHits().value > 0) {
+            List<String> response = new ArrayList<>(searchResponse.getHits().getHits().length);
+            for (SearchHit searchHit : searchResponse.getHits().getHits()) {
+                response.add(searchHit.getSourceAsString());
+            }
+            return response.toString();
+        }
+        return "";
+    }
 }

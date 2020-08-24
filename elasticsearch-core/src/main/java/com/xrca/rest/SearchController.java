@@ -87,4 +87,17 @@ public class SearchController {
             return "";
         }
     }
+
+    @GetMapping("multiSearch")
+    public String multiSearch(String keyword) {
+        if (StringUtils.isEmpty(keyword)) {
+            return "请输入关键字";
+        }
+        try {
+            return searchDemo.multiSearch(keyword);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
 }
