@@ -290,4 +290,32 @@ public class SearchDemo {
         }
         return "";
     }
+
+    /**
+     * @Author xrca
+     * @Description 前缀匹配查询
+     *              prefix查询的前缀是指field被分词后的token的前缀，具体分词情况可使用_analyze api查看
+     *              若字段为keyword则不会分词，也就等同于 select * from table where cloumn_name like 'keyword%'
+     * @Date 2020-08-24 22:13
+     * @Param [keyword]
+     * @return java.lang.String
+     **/
+    public String prefixSearch(String keyword) throws Exception {
+        SearchRequest searchRequest = new SearchRequest("movie");
+
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        searchSourceBuilder.query(QueryBuilders.prefixQuery("name", keyword));
+
+        searchRequest.source(searchSourceBuilder);
+        // 解析查询结果
+        SearchResponse searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
+        if (searchResponse.getHits() != null && searchResponse.getHits().getTotalHits().value > 0) {
+            List<String> response = new ArrayList<>(searchResponse.getHits().getHits().length);
+            for (SearchHit searchHit : searchResponse.getHits().getHits()) {
+                response.add(searchHit.getSourceAsString());
+            }
+            return response.toString();
+        }
+        return "";
+    }
 }

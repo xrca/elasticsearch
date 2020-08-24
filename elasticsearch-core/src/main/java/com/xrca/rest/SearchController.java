@@ -126,4 +126,17 @@ public class SearchController {
             return "";
         }
     }
+
+    @GetMapping("prefixSearch")
+    public String prefixSearch(String keyword) {
+        if (StringUtils.isEmpty(keyword)) {
+            return "请输入查询关键字";
+        }
+        try {
+            return searchDemo.prefixSearch(keyword);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
 }
