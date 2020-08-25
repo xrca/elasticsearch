@@ -154,4 +154,14 @@ public class SearchController {
             return "";
         }
     }
+
+    @GetMapping("rangeSearch")
+    public String rangeSearch(Double minBoxOffice, Double maxBoxOffice, String beginDate, String endDate) {
+        try {
+            return searchDemo.rangeSearch(minBoxOffice, maxBoxOffice, beginDate, endDate);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
 }

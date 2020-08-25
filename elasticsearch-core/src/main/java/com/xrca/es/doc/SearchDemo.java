@@ -9,6 +9,7 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.Operator;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -336,6 +337,60 @@ public class SearchDemo {
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         searchSourceBuilder.query(QueryBuilders.wildcardQuery("desc", "*" + keyword + "*"));
 
+        searchRequest.source(searchSourceBuilder);
+        // 解析查询结果
+        SearchResponse searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
+        if (searchResponse.getHits() != null && searchResponse.getHits().getTotalHits().value > 0) {
+            List<String> response = new ArrayList<>(searchResponse.getHits().getHits().length);
+            for (SearchHit searchHit : searchResponse.getHits().getHits()) {
+                response.add(searchHit.getSourceAsString());
+            }
+            return response.toString();
+        }
+        return "";
+    }
+
+    /**
+     * @Author xrca
+     * @Description 范围查询，配个must查询，同时筛选票房范围与时间范围
+     * @Date 2020-08-26 0:07
+     * @Param [minBoxOffice, maxBoxOffice, beginDate, endDate]
+     * @return java.lang.String
+     **/
+    public String rangeSearch(Double minBoxOffice, Double maxBoxOffice, String beginDate, String endDate)
+            throws Exception {
+        SearchRequest searchRequest = new SearchRequest("movie");
+
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+        if (minBoxOffice != null || maxBoxOffice != null) {
+            // 对boxOffice进行范围查询
+            RangeQueryBuilder boxOfficeRangQueryBuilder = QueryBuilders.rangeQuery("boxOffice");
+            // 最低票房（闭区间）
+            if (minBoxOffice != null) {
+                boxOfficeRangQueryBuilder.from(minBoxOffice, true);
+            }
+            // 最高票房（闭区间）
+            if (maxBoxOffice != null) {
+                boxOfficeRangQueryBuilder.to(maxBoxOffice, true);
+            }
+            boolQueryBuilder.must(boxOfficeRangQueryBuilder);
+        }
+        if (!StringUtils.isEmpty(beginDate) || !StringUtils.isEmpty(endDate)) {
+            // 对release进行时间范围查询
+            RangeQueryBuilder releaseRangQueryBuilder = QueryBuilders.rangeQuery("release");
+            // 起始时间（闭区间）
+            if (!StringUtils.isEmpty(beginDate)) {
+                releaseRangQueryBuilder.from(beginDate, true);
+            }
+            // 结束时间（闭区间）
+            if (!StringUtils.isEmpty(endDate)) {
+                releaseRangQueryBuilder.to(endDate, true);
+            }
+            boolQueryBuilder.must(releaseRangQueryBuilder);
+        }
+
+        searchSourceBuilder.query(boolQueryBuilder);
         searchRequest.source(searchSourceBuilder);
         // 解析查询结果
         SearchResponse searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
