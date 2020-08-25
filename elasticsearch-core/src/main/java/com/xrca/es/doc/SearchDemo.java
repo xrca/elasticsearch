@@ -318,4 +318,34 @@ public class SearchDemo {
         }
         return "";
     }
+
+    /**
+     * @Author xrca
+     * @Description wildcard查询 -> select * from table where cloumn like '%keyword%'
+     * This parameter supports two wildcard operators:
+     * ?, which matches any single character
+     * *, which can match zero or more characters, including an empty one
+     *
+     * @Date 2020-08-25 23:44
+     * @Param [keyword]
+     * @return java.lang.String
+     **/
+    public String wildcardSearch(String keyword) throws Exception {
+        SearchRequest searchRequest = new SearchRequest("movie");
+
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        searchSourceBuilder.query(QueryBuilders.wildcardQuery("desc", "*" + keyword + "*"));
+
+        searchRequest.source(searchSourceBuilder);
+        // 解析查询结果
+        SearchResponse searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
+        if (searchResponse.getHits() != null && searchResponse.getHits().getTotalHits().value > 0) {
+            List<String> response = new ArrayList<>(searchResponse.getHits().getHits().length);
+            for (SearchHit searchHit : searchResponse.getHits().getHits()) {
+                response.add(searchHit.getSourceAsString());
+            }
+            return response.toString();
+        }
+        return "";
+    }
 }

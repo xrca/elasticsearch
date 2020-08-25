@@ -141,4 +141,17 @@ public class SearchController {
     }
 
     // TODO fuzzySearch
+
+    @GetMapping("wildcardSearch")
+    public String wildcardSearch(String keyword) {
+        if (StringUtils.isEmpty(keyword)) {
+            return "请输入查询关键字";
+        }
+        try {
+            return searchDemo.wildcardSearch(keyword);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
 }
