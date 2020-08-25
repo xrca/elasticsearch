@@ -368,10 +368,14 @@ public class SearchDemo {
             RangeQueryBuilder boxOfficeRangQueryBuilder = QueryBuilders.rangeQuery("boxOffice");
             // 最低票房（闭区间）
             if (minBoxOffice != null) {
+                // 其他写法，gte最终也是调用的from
+                // boxOfficeRangQueryBuilder.gte(minBoxOffice);
                 boxOfficeRangQueryBuilder.from(minBoxOffice, true);
             }
             // 最高票房（闭区间）
             if (maxBoxOffice != null) {
+                // 其他写法，lte的其实最终也是调用的to
+                // boxOfficeRangQueryBuilder.lte(maxBoxOffice);
                 boxOfficeRangQueryBuilder.to(maxBoxOffice, true);
             }
             boolQueryBuilder.must(boxOfficeRangQueryBuilder);
