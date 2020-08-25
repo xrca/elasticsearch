@@ -3,6 +3,7 @@ server:
   servlet:
     context-path: /es
 
+debug: true
 
 elasticsearch:
   # 多个,分割 ip1:9200,ip2:9200,...
