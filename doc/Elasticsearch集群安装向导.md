@@ -1,6 +1,6 @@
 # Elasticsearch集群安装向导
 
-**说明**：文档基于elasticsearch7（version 7.14.1）编写，版本差距较大时可能会产生差异。系统为centos7
+**说明**：文档基于elasticsearch7（version 7.14.1）编写，版本差距较大时可能会产生差异。系统为centos7。
 
 
 
@@ -23,7 +23,7 @@ b、均已关闭防火墙或打开9200、9300端口，云服务器请配置好�
 
 ## 1.2、下载elasticsearch安装包
 
-通过elasticsearch的官网地址https://www.elastic.co/cn/downloads/可以下载elastic公司的所有产品，提供了Linux、MacOS、Windows的安装包，同时可以选择历史版本下载。（如果elastic官网下载较慢可以找国内的镜像网站下载）
+通过elasticsearch的官网地址 https://www.elastic.co/cn/downloads/ 可以下载elastic公司的所有产品，提供了Linux、MacOS、Windows的安装包，同时可以选择历史版本下载。（如果elastic官网下载较慢可以找国内的镜像网站下载）
 
 
 
@@ -53,7 +53,7 @@ chmod u-w /etc/sudoers
 
 ## 1.4、系统配置环境参数
 
-主要提前设置一些系统环境参数（可以提前可以一下不设置，启动时可能会出现的问题：https://www.linuxidc.com/Linux/2019-08/159734.htm），可以对修改的文件先进行备份，防止修改错误。此处使用root用户进行。
+主要提前设置一些系统环境参数（可以提前可以一下不设置，启动时可能会出现的问题： https://www.linuxidc.com/Linux/2019-08/159734.htm ），可以对修改的文件先进行备份，防止修改错误。此处使用root用户进行。
 
 > 1、设置文件句柄数
 >
@@ -112,7 +112,7 @@ chmod u-w /etc/sudoers
 使用root用户，在/usr/local下创建了名为elk的文件夹，再在elk目录下创建elasticsearch目录，将上传的elasticsearch的包解压到**/usr/local/elk**目录下，此处使用root用户。
 
 ```shell
-#解压elasticsearch包到制定目录，这里的包名根据实际情况进行修改
+#解压elasticsearch包到指定目录，这里的包名根据实际情况进行修改
 tar -zxvf elasticsearch-7.14.1-linux-x86_64.tar.gz -C /usr/local/elk
 
 #将elk整个文件夹的权限赋给es用户
@@ -318,3 +318,296 @@ elasticsearch的内置分词器对中文的分词支持不够，通常情况下�
 
 # 5、目前已知的可能会有的问题及解决方案
 
+
+
+# 6、附录：
+
+三台机器的elasticsearch.yml如下
+
+> 192.168.0.201
+>
+> ```yaml
+> # ======================== Elasticsearch Configuration =========================
+> #
+> # NOTE: Elasticsearch comes with reasonable defaults for most settings.
+> #       Before you set out to tweak and tune the configuration, make sure you
+> #       understand what are you trying to accomplish and the consequences.
+> #
+> # The primary way of configuring a node is via this file. This template lists
+> # the most important settings you may want to configure for a production cluster.
+> #
+> # Please consult the documentation for further information on configuration options:
+> # https://www.elastic.co/guide/en/elasticsearch/reference/index.html
+> #
+> # ---------------------------------- Cluster -----------------------------------
+> #
+> # Use a descriptive name for your cluster:
+> #
+> cluster.name: xrca-cluster
+> #
+> # ------------------------------------ Node ------------------------------------
+> #
+> # Use a descriptive name for the node:
+> #
+> node.name: node1
+> #
+> # Add custom attributes to the node:
+> #
+> #node.attr.rack: r1
+> #
+> # ----------------------------------- Paths ------------------------------------
+> #
+> # Path to directory where to store the data (separate multiple locations by comma):
+> #
+> path.data: /usr/local/elk/elasticsearch/data
+> #
+> # Path to log files:
+> #
+> path.logs: /var/log/elasticsearch
+> #
+> # ----------------------------------- Memory -----------------------------------
+> #
+> # Lock the memory on startup:
+> #
+> bootstrap.memory_lock: true
+> #
+> # Make sure that the heap size is set to about half the memory available
+> # on the system and that the owner of the process is allowed to use this
+> # limit.
+> #
+> # Elasticsearch performs poorly when the system is swapping the memory.
+> #
+> # ---------------------------------- Network -----------------------------------
+> #
+> # By default Elasticsearch is only accessible ooft nproc 32000
+> #
+> # * hard nproc 32000
+> #
+> # * hard memlock unlimited
+> #
+> # * soft memlock unlimited localhost. Set a different
+> # address here to expose this node on the network:
+> #
+> network.host: 0.0.0.0
+> #
+> # By default Elasticsearch listens for HTTP traffic on the first free port it
+> # finds starting at 9200. Set a specific HTTP port here:
+> #
+> http.port: 9200
+> transport.port: 9300
+> 
+> #
+> # For more information, consult the network module documentation.
+> #
+> # --------------------------------- Discovery ----------------------------------
+> #
+> # Pass an initial list of hosts to perform discovery when this node is started:
+> # The default list of hosts is ["127.0.0.1", "[::1]"]
+> #
+> discovery.seed_hosts: ["192.168.0.201:9300", "192.168.0.202:9300", "192.168.0.203:9300"]
+> #
+> # Bootstrap the cluster using an initial set of master-eligible nodes:
+> #
+> cluster.initial_master_nodes: ["node1", "node2", "node3"]
+> #
+> # For more information, consult the discovery and cluster formation module documentation.
+> #
+> # ---------------------------------- Various -----------------------------------
+> #
+> # Require explicit names when deleting indices:
+> #
+> #action.destructive_requires_name: true
+> 
+> ```
+>
+> 
+
+
+
+> 192.168.0.202
+>
+> ```yaml
+> # ======================== Elasticsearch Configuration =========================
+> #
+> # NOTE: Elasticsearch comes with reasonable defaults for most settings.
+> #       Before you set out to tweak and tune the configuration, make sure you
+> #       understand what are you trying to accomplish and the consequences.
+> #
+> # The primary way of configuring a node is via this file. This template lists
+> # the most important settings you may want to configure for a production cluster.
+> #
+> # Please consult the documentation for further information on configuration options:
+> # https://www.elastic.co/guide/en/elasticsearch/reference/index.html
+> #
+> # ---------------------------------- Cluster -----------------------------------
+> #
+> # Use a descriptive name for your cluster:
+> #
+> cluster.name: xrca-cluster
+> #
+> # ------------------------------------ Node ------------------------------------
+> #
+> # Use a descriptive name for the node:
+> #
+> node.name: node2
+> #
+> # Add custom attributes to the node:
+> #
+> #node.attr.rack: r1
+> #
+> # ----------------------------------- Paths ------------------------------------
+> #
+> # Path to directory where to store the data (separate multiple locations by comma):
+> #
+> path.data: /usr/local/elk/elasticsearch/data
+> #
+> # Path to log files:
+> #
+> path.logs: /var/log/elasticsearch
+> #
+> # ----------------------------------- Memory -----------------------------------
+> #
+> # Lock the memory on startup:
+> #
+> bootstrap.memory_lock: true
+> #
+> # Make sure that the heap size is set to about half the memory available
+> # on the system and that the owner of the process is allowed to use this
+> # limit.
+> #
+> # Elasticsearch performs poorly when the system is swapping the memory.
+> #
+> # ---------------------------------- Network -----------------------------------
+> #
+> # By default Elasticsearch is only accessible on localhost. Set a different
+> # address here to expose this node on the network:
+> #
+> network.host: 0.0.0.0
+> #
+> # By default Elasticsearch listens for HTTP traffic on the first free port it
+> # finds starting at 9200. Set a specific HTTP port here:
+> #
+> http.port: 9200
+> 
+> transport.port: 9300
+> 
+> #
+> # For more information, consult the network module documentation.
+> #
+> # --------------------------------- Discovery ----------------------------------
+> #
+> # Pass an initial list of hosts to perform discovery when this node is started:
+> # The default list of hosts is ["127.0.0.1", "[::1]"]
+> #
+> discovery.seed_hosts: ["192.168.0.201:9300", "192.168.0.202:9300", "192.168.0.203:9300"]
+> #
+> # Bootstrap the cluster using an initial set of master-eligible nodes:
+> #
+> cluster.initial_master_nodes: ["node1", "node2", "node3"]
+> #
+> # For more information, consult the discovery and cluster formation module documentation.
+> #
+> # ---------------------------------- Various -----------------------------------
+> #
+> # Require explicit names when deleting indices:
+> #
+> #action.destructive_requires_name: true
+> 
+> ```
+>
+> 
+
+
+
+> 192.168.0.203
+>
+> ```yaml
+> # ======================== Elasticsearch Configuration =========================
+> #
+> # NOTE: Elasticsearch comes with reasonable defaults for most settings.
+> #       Before you set out to tweak and tune the configuration, make sure you
+> #       understand what are you trying to accomplish and the consequences.
+> #
+> # The primary way of configuring a node is via this file. This template lists
+> # the most important settings you may want to configure for a production cluster.
+> #
+> # Please consult the documentation for further information on configuration options:
+> # https://www.elastic.co/guide/en/elasticsearch/reference/index.html
+> #
+> # ---------------------------------- Cluster -----------------------------------
+> #
+> # Use a descriptive name for your cluster:
+> #
+> cluster.name: xrca-cluster
+> #
+> # ------------------------------------ Node ------------------------------------
+> #
+> # Use a descriptive name for the node:
+> #
+> node.name: node3
+> #
+> # Add custom attributes to the node:
+> #
+> #node.attr.rack: r1
+> #
+> # ----------------------------------- Paths ------------------------------------
+> #
+> # Path to directory where to store the data (separate multiple locations by comma):
+> #
+> path.data: /usr/local/elk/elasticsearch/data
+> #
+> # Path to log files:
+> #
+> path.logs: /var/log/elasticsearch
+> #
+> # ----------------------------------- Memory -----------------------------------
+> #
+> # Lock the memory on startup:
+> #
+> bootstrap.memory_lock: true
+> #
+> # Make sure that the heap size is set to about half the memory available
+> # on the system and that the owner of the process is allowed to use this
+> # limit.
+> #
+> # Elasticsearch performs poorly when the system is swapping the memory.
+> #
+> # ---------------------------------- Network -----------------------------------
+> #
+> # By default Elasticsearch is only accessible on localhost. Set a different
+> # address here to expose this node on the network:
+> #
+> network.host: 0.0.0.0
+> #
+> # By default Elasticsearch listens for HTTP traffic on the first free port it
+> # finds starting at 9200. Set a specific HTTP port here:
+> #
+> http.port: 9200
+> 
+> transport.port: 9300
+> 
+> #
+> # For more information, consult the network module documentation.
+> #
+> # --------------------------------- Discovery ----------------------------------
+> #
+> # Pass an initial list of hosts to perform discovery when this node is started:
+> # The default list of hosts is ["127.0.0.1", "[::1]"]
+> #
+> discovery.seed_hosts: ["192.168.0.201:9300", "192.168.0.202:9300", "192.168.0.203:9300"]
+> #
+> # Bootstrap the cluster using an initial set of master-eligible nodes:
+> #
+> cluster.initial_master_nodes: ["node1", "node2", "node3"]
+> #
+> # For more information, consult the discovery and cluster formation module documentation.
+> #
+> # ---------------------------------- Various -----------------------------------
+> #
+> # Require explicit names when deleting indices:
+> #
+> #action.destructive_requires_name: true
+> 
+> ```
+>
+> 
